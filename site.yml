@@ -1,50 +1,50 @@
 ---
-
--  hosts: all
-   become: true
-   pre_tasks:
-
-   -  name: Update OS (Ubuntu)
+- hosts: all
+  become: true
+  pre_tasks:
+    - name: Update OS (Ubuntu)
       apt:
         upgrade: dist
         update_cache: yes
       when: ansible_distribution == "Ubuntu"
 
-   -  name: Update OS (CentOS)
+    - name: Update OS (CentOS)
       dnf:
         update_only: yes
-        update_cache: true
-        type: latest
+        update_cache: yes
+      when: ansible_distribution == "CentOS"
+
+- hosts: WebServers
+  become: true
+  tasks:
+    - name: install apache2 and php package Ubuntu
+      package:
+        name:
+          - apache2
+          - libapache2-mod-php
+        state: latest
       when: ansible_distribution == "Ubuntu"
 
-   tasks:
+    - name: install apache and php package CentOS
+      package:
+        name:
+          - httpd
+          - php
+        state: latest
+      when: ansible_distribution == "CentOS"
 
-   - hosts: WebServers
-     become: true
-     task:
-
-     -  name: install apache2 and php package Ubuntu
-        package:
-          name: 
-          -  apache2
-          -  libapache2-mod-php
-          state: latest
-        when: ansible_distribution == "Ubuntu"
-
-     -  name: install apache and php package CentOS
-        package:
-          name:
-          -  httpd
-          -  php
-          state: latest
-        when: ansible_distribution == "CentOS"
-
-   - hosts: DBServers
-     become: true
-     tasks:
-
-     - name: install MariaDB
-       package:
-         name:
-           - mariadb
-         state: latest
+- hosts: DBServers
+  become: true
+  tasks:
+    - name: install MariaDB (CentOS)
+      dnf:
+        name:
+          - mariadb
+        state: latest
+      when: ansible_distribution == "CentOS"
+    - name: install MariaDB (Ubuntu)
+      apt:
+        name:
+          - mariadb-server
+        state: latest
+      when: ansible_distribution == "Ubuntu"
