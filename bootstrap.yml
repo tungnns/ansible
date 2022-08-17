@@ -1,0 +1,39 @@
+---
+- hosts: all
+  become: true
+  pre_tasks:
+    - name: Update OS (Ubuntu)
+      tags: always
+      apt:
+        update_cache: yes
+        upgrade: dist
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Update OS (CentOS)
+      tags: always
+      dnf:
+        update_only: yes
+        update_cache: yes
+      when: ansible_distribution == "CentOS"
+
+  tasks:
+    - name: create tungnns user
+      tags: always
+      user:
+        name: tungnns
+        groups: root
+
+    - name: add ssh key for tungnns
+      tags: always
+      authorized_key:
+        user: tungnns
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICkAycsOZQupjYlFBywVlyTsOTFSIsSCIzUshibYZeXw ansible"
+
+    - name: add sudoers file for tungnns
+      tags: always
+      copy:
+        src: sudoer_tungnns
+        dest: /etc/sudoers.d/tungnns
+        owner: root
+        mode: 0440
+

@@ -2,19 +2,25 @@
 - hosts: all
   become: true
   pre_tasks:
-    - name: Update OS (Ubuntu)
+    - name: Update repo cache (Ubuntu)
       tags: always
       apt:
-        upgrade: dist
         update_cache: yes
+      changed_when: false
       when: ansible_distribution == "Ubuntu"
 
-    - name: Update OS (CentOS)
+    - name: Update repo cache (CentOS)
       tags: always
       dnf:
-        update_only: yes
         update_cache: yes
+      changed_when: false
       when: ansible_distribution == "CentOS"
+
+    - name: add ssh key for tungnns
+      tags: always
+      authorized_key:
+        user: tungnns
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICkAycsOZQupjYlFBywVlyTsOTFSIsSCIzUshibYZeXw ansible"
 
 - hosts: WebServers
   become: true
