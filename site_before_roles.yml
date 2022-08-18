@@ -1,0 +1,85 @@
+---
+- hosts: all
+  become: true
+  pre_tasks:
+    - name: Update repo cache (Ubuntu)
+      tags: always
+      apt:
+        update_cache: yes
+      changed_when: false
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Update repo cache (CentOS)
+      tags: always
+      dnf:
+        update_cache: yes
+      changed_when: false
+      when: ansible_distribution == "CentOS"
+
+    - name: add ssh key for tungnns
+      tags: always
+      authorized_key:
+        user: tungnns
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICkAycsOZQupjYlFBywVlyTsOTFSIsSCIzUshibYZeXw ansible"
+
+- hosts: WebServers
+  become: true
+  tasks:
+    - name: install apache2 and php package (Ubuntu)
+      tags: apache2,php,ubuntu
+      package:
+        name:
+          - apache2
+          - libapache2-mod-php
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+    - name: start apache2 service (Ubuntu)
+      tags: apache2,php,ubuntu
+      service:
+        name: apache2
+        state: started
+      when: ansible_distribution == "Ubuntu"
+
+    - name: install httpd and php package (CentOS)
+      tags: httpd,php,centos
+      package:
+        name:
+          - httpd
+          - php
+        state: latest
+      when: ansible_distribution == "CentOS"
+      
+    - name: start httpd service (CentOS)
+      tags: httpd,php,centos
+      service:
+        name: httpd
+        state: started
+      when: ansible_distribution == "CentOS"
+
+- hosts: DBServers
+  become: true
+  tasks:
+    - name: install MariaDB (CentOS)
+      tags: mariadb,centos
+      dnf:
+        name:
+          - mariadb
+        state: latest
+      when: ansible_distribution == "CentOS"
+    - name: install MariaDB (Ubuntu)
+      tags: mariadb,ubuntu
+      apt:
+        name:
+          - mariadb-server
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+- hosts: FileServers
+  become: true
+  tasks:
+    - name: install samba package
+      tags: samba
+      package:
+        name: samba
+        state: latest

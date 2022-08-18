@@ -1,0 +1,14 @@
+- hosts: WebServers
+  become: true
+  roles: 
+    - WebServers
+
+- hosts: DBServers
+  become: true
+  roles: 
+    - DBServers
+
+- hosts: FileServers
+  become: true
+  roles:
+    - FileServers  
