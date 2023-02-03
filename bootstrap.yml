@@ -17,23 +17,23 @@
       when: ansible_distribution == "CentOS"
 
   tasks:
-    - name: create tungnns user
+    - name: create ansible user
       tags: always
       user:
-        name: tungnns
+        name: ansible
         groups: root
 
-    - name: add ssh key for tungnns
+    - name: add ssh key for ansible
       tags: always
       authorized_key:
-        user: tungnns
+        user: ansible
         key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICkAycsOZQupjYlFBywVlyTsOTFSIsSCIzUshibYZeXw ansible"
 
-    - name: add sudoers file for tungnns
+    - name: add sudoers file for ansible
       tags: always
       copy:
-        src: sudoer_tungnns
-        dest: /etc/sudoers.d/tungnns
+        src: sudoer_ansible
+        dest: /etc/sudoers.d/ansible
         owner: root
         mode: 0440
 
